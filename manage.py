@@ -1,6 +1,7 @@
 import os
 import random
 import requests
+from os import listdir
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -98,23 +99,16 @@ def post_to_group(media_id, owner_id, comment):
         raise requests.exceptions.HTTPError(response_result['error'])
 
 
-def remove_posted_image(filename, folder='images'):
-    filepath = os.path.join(folder, filename) 
-    try:   
-        os.remove(filepath)
-    except OSError:
-        print('Не найден файл для удаления:', filepath)
-
-
 if __name__ == '__main__':
     
     version = 5.103
-    
+    comic_folder = 'images'
+
     load_dotenv()
     access_token = os.getenv('ACCESS_TOKEN')
     group_id = os.getenv('GROUP_ID')
 
-    Path('images').mkdir(parents=True, exist_ok=True)
+    Path(comic_folder).mkdir(parents=True, exist_ok=True)
 
     comic_count = get_comic_count()
 
@@ -123,12 +117,13 @@ if __name__ == '__main__':
     comic_filename = comic_image_url.split('/')[-1]
     download_comic_image(comic_image_url, comic_filename)
 
-    upload_image_url = get_upload_image_url()
-
-    server, photo, hash_code = upload_image_to_server(upload_image_url, comic_filename)
-
-    media_id, owner_id = save_image_in_group_album(server, photo, hash_code)
-    
-    post_to_group(media_id, owner_id, comic_author_comment)
-
-    remove_posted_image(comic_filename)
+    try:
+        upload_image_url = get_upload_image_url()
+        server, photo, hash_code = upload_image_to_server(upload_image_url, comic_filename)
+        media_id, owner_id = save_image_in_group_album(server, photo, hash_code)
+        post_to_group(media_id, owner_id, comic_author_comment)
+    finally: 
+        files = listdir(comic_folder)
+        for file in files:
+            filepath = os.path.join(comic_folder, file)
+            os.remove(filepath)
