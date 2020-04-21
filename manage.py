@@ -101,7 +101,7 @@ def remove_posted_image(filename, folder='images'):
 
 if __name__ == '__main__':
     
-    VERSION = 5.103
+    version = 5.103
     
     load_dotenv()
     access_token = os.getenv('ACCESS_TOKEN')
