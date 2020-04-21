@@ -40,9 +40,10 @@ def get_upload_image_url():
         'v':version
     }
     response = requests.get(url, params=params)
-    if 'error' in response:
-        raise requests.exceptions.HTTPError(response['error'])
-    upload_image_url = response.json()['response']['upload_url']
+    response_result = response.json()
+    if 'error' in response_result:
+        raise requests.exceptions.HTTPError(response_result['error'])
+    upload_image_url = response_result['response']['upload_url']
     return upload_image_url
 
 
@@ -53,9 +54,9 @@ def upload_image_to_server(url, filename, folder='images'):
             'photo': file,
         }
         response = requests.post(url, files=files)
-        if 'error' in response:
-            raise requests.exceptions.HTTPError(response['error'])    
-    response_result = response.json()
+        response_result = response.json()
+        if 'error' in response_result:
+            raise requests.exceptions.HTTPError(response_result['error'])    
     server = response_result['server']
     photo = response_result['photo']
     hash_code = response_result['hash']
@@ -73,11 +74,11 @@ def save_image_in_group_album(server, photo, hash_code):
         'v':version,
     }
     response = requests.post(url, params=params)
-    response_result = response.json()['response']
-    if 'error' in response:
-        raise requests.exceptions.HTTPError(response['error'])
-    media_id = response_result[0]['id']
-    owner_id = response_result[0]['owner_id']
+    response_result = response.json()
+    if 'error' in response_result:
+        raise requests.exceptions.HTTPError(response_result['error'])
+    media_id = response_result['response'][0]['id']
+    owner_id = response_result['response'][0]['owner_id']
     return media_id, owner_id
 
 
@@ -92,8 +93,9 @@ def post_to_group(media_id, owner_id, comment):
         'v':version,
     }
     response = requests.post(url, params=params)
-    if 'error' in response:
-        raise requests.exceptions.HTTPError(response['error'])
+    response_result = response.json()
+    if 'error' in response_result:
+        raise requests.exceptions.HTTPError(response_result['error'])
 
 
 def remove_posted_image(filename, folder='images'):
