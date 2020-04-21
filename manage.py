@@ -37,9 +37,11 @@ def get_upload_image_url():
     params = {
         'group_id':group_id,
         'access_token':access_token, 
-        'v':VERSION
+        'v':version
     }
     response = requests.get(url, params=params)
+    if 'error' in response:
+        raise requests.exceptions.HTTPError(response['error'])
     upload_image_url = response.json()['response']['upload_url']
     return upload_image_url
 
@@ -51,7 +53,8 @@ def upload_image_to_server(url, filename, folder='images'):
             'photo': file,
         }
         response = requests.post(url, files=files)
-    response.raise_for_status()
+        if 'error' in response:
+            raise requests.exceptions.HTTPError(response['error'])    
     response_result = response.json()
     server = response_result['server']
     photo = response_result['photo']
@@ -67,11 +70,12 @@ def save_image_in_group_album(server, photo, hash_code):
         'hash':hash_code,
         'group_id':group_id,
         'access_token':access_token, 
-        'v':VERSION,
+        'v':version,
     }
     response = requests.post(url, params=params)
     response_result = response.json()['response']
-    response.raise_for_status()
+    if 'error' in response:
+        raise requests.exceptions.HTTPError(response['error'])
     media_id = response_result[0]['id']
     owner_id = response_result[0]['owner_id']
     return media_id, owner_id
@@ -85,10 +89,11 @@ def post_to_group(media_id, owner_id, comment):
         'message':comment,
         'from_group':0,
         'access_token':access_token, 
-        'v':VERSION,
+        'v':version,
     }
     response = requests.post(url, params=params)
-    response.raise_for_status()
+    if 'error' in response:
+        raise requests.exceptions.HTTPError(response['error'])
 
 
 def remove_posted_image(filename, folder='images'):
