@@ -77,7 +77,7 @@ def save_image_in_group_album(server, photo, hash_code):
     return media_id, owner_id
 
 
-def posting_to_group(media_id, owner_id, comment):
+def post_to_group(media_id, owner_id, comment):
     url = 'https://api.vk.com/method/wall.post'
     params = {
         'owner_id':f'-{group_id}',
@@ -122,6 +122,6 @@ if __name__ == '__main__':
 
     media_id, owner_id = save_image_in_group_album(server, photo, hash_code)
     
-    posting_to_group(media_id, owner_id, comic_author_comment)
+    post_to_group(media_id, owner_id, comic_author_comment)
 
     remove_posted_image(comic_filename)
